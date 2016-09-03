@@ -1,0 +1,15 @@
+{
+  "name": "dragonshift",
+  "version": "0.0.1",
+  "description": "Dragnoshift is a web-based MMORPG.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "AmaziR",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.0",
+    "socket.io": "^1.4.8"
+  }
+}
