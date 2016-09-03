@@ -9,6 +9,7 @@ canvas.height = 480;
 
 var player = new Player(50, 50, "Alban");
 
+// Initializing players
 io.emit('new_player', player.getX(), player.getY(), player.getNickname());
 
 // Setting up Event Handlers
@@ -17,6 +18,8 @@ function setUpEventHandlers()
 	io.on('user_id', function(id)
 	{
 		player.setID(id);
+		// Send user ID to server
+		io.emit('id_incoming', id);
 	});
 }
 

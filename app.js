@@ -28,15 +28,17 @@ function setUpEventHandlers()
 			players.push(player);
 			console.log("Initilized new player: "+n);
 			io.emit('user_id', players.length);
-			socket.id = players.length;
-			console.log(players);
+			console.log(players.length);
 		});
 
-		// On user disconnect
-		socket.on('disconnect', function()
+		// On user ID incoming
+		socket.on('id_incoming', function(id)
 		{
-			delete players[socket.id];
-			console.log(players);
+			// On user disconnect
+			socket.on('disconnect', function()
+			{
+				delete players[id-1];
+			});
 		});
 	});
 }
