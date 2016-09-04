@@ -7,37 +7,106 @@ var ctx = canvas.getContext('2d');
 canvas.width = 640;
 canvas.height = 480;
 
-var player = new Player(50, 50, "Alban");
-
-// Initializing players
-io.emit('new_player', player.getX(), player.getY(), player.getNickname());
+var pImg = new Image();
+pImg.src = "img/player/outfits/player.gif";
 
 // Setting up Event Handlers
 function setUpEventHandlers()
 {
-	io.on('user_id', function(id)
+	io.on('new_positions', function(data)
 	{
-		player.setID(id);
-		// Send user ID to server
-		io.emit('id_incoming', id);
+		// Drawing game
+		ctx.clearRect(0,0,canvas.width,canvas.height);
+		for(var i=0; i<data.length;i++)
+		{
+			ctx.drawImage(pImg,data[i].x,data[i].y);
+		}
+
 	});
 }
 
-// Drawing game
-function draw()
+// Player movement
+function move(event, g)
 {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-	ctx.fillRect(0, 0, 32, 32);
-
-	window.requestAnimationFrame(draw);
+	if(g = 0)
+	{
+		switch(event.keyCode)
+		{
+			case 37:
+				io.emit('key_pressed',{inputId:'key_left',state:true});
+				break;
+			case 39:
+				io.emit('key_pressed',{inputId:'key_right',state:true});
+				break;
+			case 38:
+				io.emit('key_pressed',{inputId:'key_up',state:true});
+				break;
+			case 40:
+				io.emit('key_pressed',{inputId:'key_down',state:true});
+				break;
+		}
+	}
+	else
+	{
+		switch(event.keyCode)
+		{
+			case 37:
+				io.emit('key_pressed',{inputId:'key_left',state:false});
+				break;
+			case 39:
+				io.emit('key_pressed',{inputId:'key_right',state:false});
+				break;
+			case 38:
+				io.emit('key_pressed',{inputId:'key_up',state:false});
+				break;
+			case 40:
+				io.emit('key_pressed',{inputId:'key_down',state:false});
+				break;
+		}
+	}
 }
 
 // Initialize game
 function init()
 {
 	setUpEventHandlers();
-	window.requestAnimationFrame(draw);
+
+	document.onkeydown = function(event)
+	{
+		switch(event.keyCode)
+		{
+			case 37:
+				io.emit('key_pressed',{inputId:'key_left',state:true});
+				break;
+			case 39:
+				io.emit('key_pressed',{inputId:'key_right',state:true});
+				break;
+			case 38:
+				io.emit('key_pressed',{inputId:'key_up',state:true});
+				break;
+			case 40:
+				io.emit('key_pressed',{inputId:'key_down',state:true});
+				break;
+		}
+	}
+	document.onkeyup = function(event)
+	{
+		switch(event.keyCode)
+		{
+			case 37:
+				io.emit('key_pressed',{inputId:'key_left',state:false});
+				break;
+			case 39:
+				io.emit('key_pressed',{inputId:'key_right',state:false});
+				break;
+			case 38:
+				io.emit('key_pressed',{inputId:'key_up',state:false});
+				break;
+			case 40:
+				io.emit('key_pressed',{inputId:'key_down',state:false});
+				break;
+		}
+	}
 }
 
 init();

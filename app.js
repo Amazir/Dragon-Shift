@@ -7,6 +7,7 @@ var app = express();
 
 // Array of players
 var players = [];
+var sockets = [];
 
 // Setting up HTTP routing
 function setUpRouting()
@@ -21,24 +22,35 @@ function setUpEventHandlers()
 	// On user connection
 	io.on('connection', function(socket)
 	{
-		// On new player
-		socket.on('new_player', function(x,y,n)
+		socket.id = Math.random();
+		sockets[socket.id] = socket;
+
+		var player = new Player(50, 50, socket.id);
+		players[socket.id] = player;
+
+		socket.on('disconnect', function()
 		{
-			var player = new Player(x,y,players.length+1);
-			players.push(player);
-			console.log("Initilized new player: "+n);
-			io.emit('user_id', players.length);
-			console.log(players.length);
+			delete sockets[socket.id];
+			delete players[socket.id];
 		});
 
-		// On user ID incoming
-		socket.on('id_incoming', function(id)
+		socket.on('key_pressed', function(data)
 		{
-			// On user disconnect
-			socket.on('disconnect', function()
+			switch(data.inputId)
 			{
-				delete players[id-1];
-			});
+				case "key_left":
+					player.pressingLeft = data.state;
+					break;
+				case "key_right":
+					player.pressingRight = data.state;
+					break;
+				case "key_up":
+					player.pressingUp = data.state;
+					break;
+				case "key_down":
+					player.pressingDown = data.state;
+					break;
+			}
 		});
 	});
 }
@@ -48,6 +60,27 @@ function init()
 {
 	setUpRouting();
 	setUpEventHandlers();
+
+	setInterval(function()
+	{
+	    var pack = [];
+	    for(var i in players)
+	    {
+	        var player = players[i];
+	        player.updatePosition();
+	        pack.push(
+	        {
+	            x:player.x,
+	            y:player.y,
+	            number:player.number
+	        });    
+	    }
+	    for(var i in sockets)
+	    {
+	        var socket = sockets[i];
+	        socket.emit('new_positions',pack);
+	    }
+	},1000/25);
 }
 
 init();
