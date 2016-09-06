@@ -1,4 +1,25 @@
+body
+{
+	background-image: url(res/img/window/bg.jpg);
+}
+
+#chat
+{
+	position: fixed; bottom: 0; width: 100%;
+	padding: 3px;
+}
+
+#messages
+{
+	list-style-type: none;
+	margin: 0;
+	margin-top: 15px;
+	padding: 0;
+}
+
 #gameWindow
 {
+	background-image: url(res/img/window/temp_bg.png);
 	border: 1px solid;
+	display: inline-block;
 }

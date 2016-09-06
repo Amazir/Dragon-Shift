@@ -5,10 +5,25 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>Game</title>
 	<link rel="stylesheet" href="style.css">
+	<script
+				  src="https://code.jquery.com/jquery-3.1.0.slim.min.js"
+				  integrity="sha256-cRpWjoSOw5KcyIOaZNo4i6fZ9tKPhYYb6i5T9RSVJG8="
+				  crossorigin="anonymous"></script>
 	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 </head>
 <body>
-	<canvas id="gameWindow"></canvas>
+	<center>
+		<canvas id="gameWindow" height=1000></canvas>
+		<br>
+		<div id="menu">
+			<input id="showChat" type="submit" value="Chat" />
+		</div>
+		<ul id="messages"></div>
+		<form action="" id="chat">
+      <input id="msg" autocomplete="off" /><button>Send</button>
+    </form>
+	</center>
+	<script src="js/gui.js"></script>
 	<script src="js/game.js"></script>
 </body>
 </html>

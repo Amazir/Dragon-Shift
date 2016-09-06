@@ -5,9 +5,9 @@ var Player = require('./server/player.js');
 
 var app = express();
 
-// Array of players
-var players = [];
-var sockets = [];
+// Array of PLAYERS_LIST
+var PLAYERS_LIST = [];
+var SOCKETS_LIST = [];
 
 // Setting up HTTP routing
 function setUpRouting()
@@ -16,24 +16,31 @@ function setUpRouting()
 	app.use('/game', express.static(__dirname + '/client'));
 }
 
-// Setting up Sockets Event Handlers
+// Setting up SOCKETS_LIST Event Handlers
 function setUpEventHandlers()
 {
 	// On user connection
 	io.on('connection', function(socket)
 	{
 		socket.id = Math.random();
-		sockets[socket.id] = socket;
+		SOCKETS_LIST[socket.id] = socket;
 
 		var player = new Player(50, 50, socket.id);
-		players[socket.id] = player;
+		PLAYERS_LIST[socket.id] = player;
 
+		// On user disconnect
 		socket.on('disconnect', function()
 		{
-			delete sockets[socket.id];
-			delete players[socket.id];
+			delete SOCKETS_LIST[socket.id];
+			delete PLAYERS_LIST[socket.id];
 		});
 
+		socket.on('incoming_chat_message', function(msg)
+		{
+			io.emit('chat_message', msg);
+		});
+
+		// On key pressed by user
 		socket.on('key_pressed', function(data)
 		{
 			switch(data.inputId)
@@ -64,20 +71,20 @@ function init()
 	setInterval(function()
 	{
 	    var pack = [];
-	    for(var i in players)
+	    for(var i in PLAYERS_LIST)
 	    {
-	        var player = players[i];
+	        var player = PLAYERS_LIST[i];
 	        player.updatePosition();
 	        pack.push(
 	        {
 	            x:player.x,
 	            y:player.y,
 	            number:player.number
-	        });    
+	        });
 	    }
-	    for(var i in sockets)
+	    for(var i in SOCKETS_LIST)
 	    {
-	        var socket = sockets[i];
+	        var socket = SOCKETS_LIST[i];
 	        socket.emit('new_positions',pack);
 	    }
 	},1000/25);

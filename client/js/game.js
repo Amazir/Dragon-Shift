@@ -4,19 +4,95 @@ var io = io('http://localhost:3001');
 // Setting up canvas
 var canvas = document.getElementById('gameWindow');
 var ctx = canvas.getContext('2d');
-canvas.width = 640;
-canvas.height = 480;
+canvas.width = 1010;
+canvas.height = 620;
 
 var pImg = new Image();
-pImg.src = "img/player/outfits/player.gif";
+pImg.src = "res/img/player/outfits/player.gif";
+
+// Tiles
+var grass = new Image();
+var water = new Image();
+var sand = new Image();
+grass.src = 'res/maps/tiles/grass.png';
+water.src = 'res/maps/tiles/water.png';
+sand.src = 'res/maps/tiles/sand.png';
+
+$('#chat').submit(function()
+{
+	io.emit('incoming_chat_message', $('#msg').val());
+	$('#msg').val('');
+	return false;
+});
+
+$('#showChat').click(function()
+{
+	
+});
+
+var mapArray = [
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,2,2,2,2,2,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,2,2,2,2,2,2,2,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,2,2,2,2,2,2,2,2,2,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,2,2,2,2,2,2,2,2,2,2,2,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2]
+];
+
+var posX = 0;
+var posY = 0;
 
 // Setting up Event Handlers
 function setUpEventHandlers()
 {
+	// Game chat script
+	io.on('chat_message', function(msg)
+	{
+		$('#messages').append("<li>"+msg+"</li>");
+	});
+
 	io.on('new_positions', function(data)
 	{
 		// Drawing game
 		ctx.clearRect(0,0,canvas.width,canvas.height);
+		for(var i=0; i<mapArray.length; i++)
+		{
+			for(var j=0; j < mapArray[i].length; j++)
+			{
+				if(mapArray[i][j] == 0)
+				{
+					ctx.drawImage(grass, posX, posY, 32, 32);
+				}
+				if(mapArray[i][j] == 1)
+				{
+					ctx.drawImage(sand, posX, posY, 32, 32);
+				}
+				if(mapArray[i][j] == 2)
+				{
+					ctx.drawImage(water, posX, posY, 32, 32);
+				}
+				posX+=32;
+			}
+			posX=0;
+			posY+=32;
+		}
+		posX =0;
+		posY =0;
+
 		for(var i=0; i<data.length;i++)
 		{
 			ctx.drawImage(pImg,data[i].x,data[i].y);
