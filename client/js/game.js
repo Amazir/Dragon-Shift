@@ -10,24 +10,24 @@ canvas.height = 620;
 var pImg = new Image();
 pImg.src = "res/img/player/outfits/player.gif";
 
+var debugX =0, debugY =0;
+
 // Tiles
 var grass = new Image();
 var water = new Image();
+
 var sand = new Image();
 grass.src = 'res/maps/tiles/grass.png';
 water.src = 'res/maps/tiles/water.png';
 sand.src = 'res/maps/tiles/sand.png';
 
+var nick = "Gracz"+Math.floor(Math.random()*10)+1;
+
 $('#chat').submit(function()
 {
-	io.emit('incoming_chat_message', $('#msg').val());
+	io.emit('incoming_chat_message', nick+": "+$('#msg').val());
 	$('#msg').val('');
 	return false;
-});
-
-$('#showChat').click(function()
-{
-	
 });
 
 var mapArray = [
@@ -35,7 +35,7 @@ var mapArray = [
 [0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
 [0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
 [0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
-[0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
+[0,0,1,0,0,0,0,1,0,1,1,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
 [0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
 [0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
 [0,0,1,0,0,0,0,2,2,2,2,2,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
@@ -67,6 +67,7 @@ function setUpEventHandlers()
 
 	io.on('new_positions', function(data)
 	{
+		document.getElementById('info').innerHTML = "X: "+debugX+"<br /> Y: "+debugY+"<br />";
 		// Drawing game
 		ctx.clearRect(0,0,canvas.width,canvas.height);
 		for(var i=0; i<mapArray.length; i++)
@@ -95,7 +96,11 @@ function setUpEventHandlers()
 
 		for(var i=0; i<data.length;i++)
 		{
+			debugX = data[i].x;
+			debugY = data[i].y;
 			ctx.drawImage(pImg,data[i].x,data[i].y);
+			var collision = (data[i].x, data[i].y, 32, 32, 290, 110, 32, 32);
+			io.emit('is_colliding', collision);
 		}
 
 	});
@@ -139,7 +144,7 @@ function move(event, g)
 				io.emit('key_pressed',{inputId:'key_down',state:false});
 				break;
 		}
-	}
+	}		
 }
 
 // Initialize game
@@ -182,7 +187,7 @@ function init()
 				io.emit('key_pressed',{inputId:'key_down',state:false});
 				break;
 		}
-	}
+	}	
 }
 
 init();

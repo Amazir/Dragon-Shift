@@ -12,18 +12,26 @@
 	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 </head>
 <body>
-	<center>
-		<canvas id="gameWindow" height=1000></canvas>
-		<br>
-		<div id="menu">
-			<input id="showChat" type="submit" value="Chat" />
-		</div>
-		<ul id="messages"></div>
-		<form action="" id="chat">
-      <input id="msg" autocomplete="off" /><button>Send</button>
-    </form>
-	</center>
-	<script src="js/gui.js"></script>
+	<div id="info">
+	X: 0<br />
+	Y: 0<br />
+	</div>
+	<div id="game">
+		<center>
+			<canvas id="gameWindow" height=1000></canvas>
+			<br>
+			<ul id="messages"></ul>
+			<form action="" id="chat">
+				<input id="msg" autocomplete="off" /><button>Send</button>
+			</form>
+		</center>
+	</div>
+	<div id="login">
+		<form action="" id="login_form">
+			<input id="nick" autocomplete="on" /><br /><button>Play</button>
+		</form>
+	</div>
+	<script src="js/physics.js"></script>
 	<script src="js/game.js"></script>
 </body>
 </html>

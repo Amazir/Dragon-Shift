@@ -28,6 +28,16 @@ function setUpEventHandlers()
 		var player = new Player(50, 50, socket.id);
 		PLAYERS_LIST[socket.id] = player;
 
+		// Collision
+		socket.on('is_coliding', function(coll)
+		{
+			if(coll)
+			{
+				player.setY(getOldY());
+				player.setX(getOldX());
+			}
+		});
+
 		// On user disconnect
 		socket.on('disconnect', function()
 		{
