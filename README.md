@@ -1,2 +1,2 @@
 # Dragonshift
-Dragno Shift is a web-based MMORPG.
+Dragonshift is a web-based MMORPG.
