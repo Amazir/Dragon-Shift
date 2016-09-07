@@ -30,6 +30,15 @@ $('#chat').submit(function()
 	return false;
 });
 
+$('#login-signIn').click(function()
+{
+	var username = $('#login-username').val();
+	var password = $('#login-password').val();
+	io.emit('login_request', {username:username,password:password});
+	$('#login-username').val('');
+	$('#login-password').val('');
+});
+
 var mapArray = [
 [0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
 [0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2],
@@ -59,12 +68,28 @@ var posY = 0;
 // Setting up Event Handlers
 function setUpEventHandlers()
 {
+	// Login handlers
+	io.on('login_status', function(data)
+	{
+		if(data.valid)
+		{
+			$('#login').css({'display': 'none'});
+			$('#game').css({'display': 'block'});
+		}
+		else
+		{	
+			$('#login').css({'display': 'block'});
+			$('#game').css({'display': 'none'});
+		}
+	});
+
 	// Game chat script
 	io.on('chat_message', function(msg)
 	{
 		$('#messages').append("<li>"+msg+"</li>");
 	});
 
+	// On changing position by players
 	io.on('new_positions', function(data)
 	{
 		document.getElementById('info').innerHTML = "X: "+debugX+"<br /> Y: "+debugY+"<br />";
@@ -104,47 +129,6 @@ function setUpEventHandlers()
 		}
 
 	});
-}
-
-// Player movement
-function move(event, g)
-{
-	if(g = 0)
-	{
-		switch(event.keyCode)
-		{
-			case 37:
-				io.emit('key_pressed',{inputId:'key_left',state:true});
-				break;
-			case 39:
-				io.emit('key_pressed',{inputId:'key_right',state:true});
-				break;
-			case 38:
-				io.emit('key_pressed',{inputId:'key_up',state:true});
-				break;
-			case 40:
-				io.emit('key_pressed',{inputId:'key_down',state:true});
-				break;
-		}
-	}
-	else
-	{
-		switch(event.keyCode)
-		{
-			case 37:
-				io.emit('key_pressed',{inputId:'key_left',state:false});
-				break;
-			case 39:
-				io.emit('key_pressed',{inputId:'key_right',state:false});
-				break;
-			case 38:
-				io.emit('key_pressed',{inputId:'key_up',state:false});
-				break;
-			case 40:
-				io.emit('key_pressed',{inputId:'key_down',state:false});
-				break;
-		}
-	}		
 }
 
 // Initialize game

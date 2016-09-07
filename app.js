@@ -1,6 +1,7 @@
 // Requires
 var express = require('express');
 var io = require('socket.io')(3001);
+var mysql = require('mysql');
 var Player = require('./server/player.js');
 
 var app = express();
@@ -8,6 +9,24 @@ var app = express();
 // Array of PLAYERS_LIST
 var PLAYERS_LIST = [];
 var SOCKETS_LIST = [];
+
+// Mysql config
+var db_conn = mysql.createConnection(
+{
+	host      : 'localhost',
+	user      : 'root',
+	password  : '',
+	database  : 'dragonshift'
+});
+
+// Connecting to DB
+db_conn.connect(function(err)
+{
+	if(err)
+		console.log(err);
+	else
+		console.log("DB CONNECTED");
+});
 
 // Setting up HTTP routing
 function setUpRouting()
@@ -22,21 +41,38 @@ function setUpEventHandlers()
 	// On user connection
 	io.on('connection', function(socket)
 	{
+		// Login request
+		socket.on('login_request', function(data)
+		{
+			db_conn.query("SELECT * FROM players WHERE login='"+
+				data.username+"' AND pass='"+
+				data.password+"'", 
+				function(err, rows, fields)
+				{
+					if(err)
+						console.log(err);
+					else
+					{
+						if(rows.length === 1)
+						{
+							socket.emit('login_status', {valid:true});
+						}
+						else
+						{
+							socket.emit('login_status', {valid:false});
+						}
+					}
+				});
+		});
+	});
+
+	io.on('connection', function(socket)
+	{
 		socket.id = Math.random();
 		SOCKETS_LIST[socket.id] = socket;
 
 		var player = new Player(50, 50, socket.id);
 		PLAYERS_LIST[socket.id] = player;
-
-		// Collision
-		socket.on('is_coliding', function(coll)
-		{
-			if(coll)
-			{
-				player.setY(getOldY());
-				player.setX(getOldX());
-			}
-		});
 
 		// On user disconnect
 		socket.on('disconnect', function()

@@ -1,6 +1,19 @@
 body
 {
-	background-image: url(res/img/window/bg.jpg);
+	/*background-image: url(res/img/window/bg.jpg);*/
+}
+
+#login_form
+{
+	display: none;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
+#game
+{
+	display: block;
 }
 
 #chat

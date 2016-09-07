@@ -12,12 +12,18 @@
 	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 </head>
 <body>
-	<div id="info">
-	X: 0<br />
-	Y: 0<br />
+	<div id="login">
+		Username: <input id="login-username" type="text" /><br />
+		Password: <input id="login-password" type="password" /><br />
+		<button id="login-signIn">Sign In</button>
+		<button id="login-signUp">Sign Up</button>
 	</div>
-	<div id="game">
+	<div id="game" style="display: none;">
 		<center>
+			<div id="info">
+			X: 0<br />
+			Y: 0<br />
+			</div>
 			<canvas id="gameWindow" height=1000></canvas>
 			<br>
 			<ul id="messages"></ul>
@@ -25,11 +31,6 @@
 				<input id="msg" autocomplete="off" /><button>Send</button>
 			</form>
 		</center>
-	</div>
-	<div id="login">
-		<form action="" id="login_form">
-			<input id="nick" autocomplete="on" /><br /><button>Play</button>
-		</form>
 	</div>
 	<script src="js/physics.js"></script>
 	<script src="js/game.js"></script>
