@@ -28,5 +28,5 @@ function setCookie(name, val, days)
     } 
     else 
         var expires = "";
-    document.cookie = name + "=" + val + expires + "; path=/";
+    document.cookie = name + "=" + val + expires + "; path:3000=/game";
 }

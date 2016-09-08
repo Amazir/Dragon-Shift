@@ -63,7 +63,6 @@ $('#login-signIn').click(function()
 
 $('#logout').click(function()
 {
-	alert("dasjdaslj");
 	io.emit('logout');
 
 	io.on('logged_out', function()
@@ -111,7 +110,7 @@ function setUpEventHandlers()
 
 			io.on('session_code', function(data)
 			{
-				setCookie('session_id', data, 1);
+				setCookie('session_id', data);
 			});
 		}
 		else
