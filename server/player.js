@@ -11,6 +11,8 @@ function Player(x, y, id)
 	this.id = id;
 	this.nick = "unnamed";
 
+	this.sessionCode = "";
+
 	this.pressingRight = false;
 	this.pressingLeft = false;
 	this.pressingUp = false;
@@ -42,6 +44,16 @@ method.updatePosition = function()
 		this.y+=this.maxSpd;
 	}
 }
+
+method.setSessionCode = function(code)
+{
+	this.sessionCode = code;
+};
+
+method.getSessionCode = function()
+{
+	return this.sessionCode;
+};
 
 method.getX = function()
 {

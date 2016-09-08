@@ -21,13 +21,35 @@ grass.src = 'res/maps/tiles/grass.png';
 water.src = 'res/maps/tiles/water.png';
 sand.src = 'res/maps/tiles/sand.png';
 
-var nick = "Gracz"+Math.floor(Math.random()*10)+1;
+var nick = "Aamzir";
 
-$('#chat').submit(function()
+window.onload = function()
+{
+	if(showCookie('session_id'))
+	{
+		io.emit('re_session', showCookie('session_id'));
+		io.on('re_session_status', function(data)
+		{
+			if(data.valid)
+			{
+				$('#login').css({'display': 'none'});
+				$('#game').css({'display': 'block'});
+			}
+			else
+				deleteCookie('session_id');
+		});
+	}
+	else
+	{
+		$('#login').css({'display': 'block'});
+		$('#game').css({'display': 'none'});
+	}
+};
+
+$('#send_msg').click(function()
 {
 	io.emit('incoming_chat_message', nick+": "+$('#msg').val());
 	$('#msg').val('');
-	return false;
 });
 
 $('#login-signIn').click(function()
@@ -37,6 +59,17 @@ $('#login-signIn').click(function()
 	io.emit('login_request', {username:username,password:password});
 	$('#login-username').val('');
 	$('#login-password').val('');
+});
+
+$('#logout').click(function()
+{
+	alert("dasjdaslj");
+	io.emit('logout');
+
+	io.on('logged_out', function()
+	{
+		deleteCookie('session_id');
+	});
 });
 
 var mapArray = [
@@ -75,6 +108,11 @@ function setUpEventHandlers()
 		{
 			$('#login').css({'display': 'none'});
 			$('#game').css({'display': 'block'});
+
+			io.on('session_code', function(data)
+			{
+				setCookie('session_id', data, 1);
+			});
 		}
 		else
 		{	
@@ -131,10 +169,26 @@ function setUpEventHandlers()
 	});
 }
 
+function secure()
+{
+	if (showCookie('session_id')) {}
+	else
+	{
+		io.emit('logout');
+		io.on('logged_out', function()
+		{
+			$('#login').css({'display': 'block'});
+			$('#game').css({'display': 'none'});
+		});
+	}
+}
+
 // Initialize game
 function init()
 {
 	setUpEventHandlers();
+
+	setInterval(secure, 1000/25);
 
 	document.onkeydown = function(event)
 	{

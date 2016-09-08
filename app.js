@@ -2,7 +2,9 @@
 var express = require('express');
 var io = require('socket.io')(3001);
 var mysql = require('mysql');
+
 var Player = require('./server/player.js');
+var Session = require('./server/sessions.js');
 
 var app = express();
 
@@ -41,6 +43,42 @@ function setUpEventHandlers()
 	// On user connection
 	io.on('connection', function(socket)
 	{
+	});
+
+	io.on('connection', function(socket)
+	{
+		socket.id = Math.random();
+		SOCKETS_LIST[socket.id] = socket;
+
+		var player = new Player(50, 50, socket.id);
+		PLAYERS_LIST[socket.id] = player;
+
+		var session = new Session();
+
+		// On user disconnect
+		socket.on('disconnect', function()
+		{
+			delete SOCKETS_LIST[socket.id];
+			delete PLAYERS_LIST[socket.id];
+		});
+
+		socket.on('logout', function()
+		{
+			session.removeFromDB(db_conn, PLAYERS_LIST[socket.id].getSessionCode());
+			socket.emit('logged_out');
+		});
+
+		socket.on('re_session', function(data)
+		{
+			db_conn.query("SELECT * FROM temp WHERE session_id='"+data+"'", function(err, rows, fields)
+			{
+				if(rows.length === 1)
+					socket.emit('re_session_status', {valid:true});
+				else
+					socket.emit('re_session_status', {valid:true});
+			});
+		});
+
 		// Login request
 		socket.on('login_request', function(data)
 		{
@@ -56,6 +94,10 @@ function setUpEventHandlers()
 						if(rows.length === 1)
 						{
 							socket.emit('login_status', {valid:true});
+							var sid = session.generateID();
+							PLAYERS_LIST[socket.id].setSessionCode(sid);
+							session.addToDB(db_conn, sid, data.username);
+							socket.emit('session_code', PLAYERS_LIST[socket.id].getSessionCode());
 						}
 						else
 						{
@@ -64,23 +106,8 @@ function setUpEventHandlers()
 					}
 				});
 		});
-	});
 
-	io.on('connection', function(socket)
-	{
-		socket.id = Math.random();
-		SOCKETS_LIST[socket.id] = socket;
-
-		var player = new Player(50, 50, socket.id);
-		PLAYERS_LIST[socket.id] = player;
-
-		// On user disconnect
-		socket.on('disconnect', function()
-		{
-			delete SOCKETS_LIST[socket.id];
-			delete PLAYERS_LIST[socket.id];
-		});
-
+		// On incoming chat message
 		socket.on('incoming_chat_message', function(msg)
 		{
 			io.emit('chat_message', msg);
