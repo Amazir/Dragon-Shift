@@ -7,9 +7,9 @@ function Session()
 
 method.addToDB = function(db, sid, usr)
 {
-	db.query("INSERT INTO temp (session_id, username) VALUES ('"+
+	db.query("INSERT INTO temp (session_id, username, securex) VALUES ('"+
 		sid+"', '"+
-		usr+"')", function(error)
+		usr+"', 1)", function(error)
 		{
 			if(error)
 				console.log(error);
@@ -18,7 +18,7 @@ method.addToDB = function(db, sid, usr)
 
 method.removeFromDB = function(db,sid)
 {
-	db.query("DELETE FROM temp WHERE session_id='"+sid+"'", function(error)
+	db.query("DELETE FROM temp WHERE securex=1", function(error)
 	{
 		if(error)
 			console.log(error);
