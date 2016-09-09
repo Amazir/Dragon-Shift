@@ -8,6 +8,8 @@ var Session = require('./server/sessions.js');
 
 var app = express();
 
+var session = new Session();
+
 // Array of PLAYERS_LIST
 var PLAYERS_LIST = [];
 var SOCKETS_LIST = [];
@@ -40,11 +42,7 @@ function setUpRouting()
 // Setting up SOCKETS_LIST Event Handlers
 function setUpEventHandlers()
 {
-	// On user connection
-	io.on('connection', function(socket)
-	{
-	});
-
+	// On connection
 	io.on('connection', function(socket)
 	{
 		socket.id = Math.random();
@@ -53,8 +51,6 @@ function setUpEventHandlers()
 		var player = new Player(50, 50, socket.id);
 		PLAYERS_LIST[socket.id] = player;
 
-		var session = new Session();
-
 		// On user disconnect
 		socket.on('disconnect', function()
 		{
@@ -62,12 +58,14 @@ function setUpEventHandlers()
 			delete PLAYERS_LIST[socket.id];
 		});
 
+		// On user logout
 		socket.on('logout', function()
 		{
 			session.removeFromDB(db_conn, PLAYERS_LIST[socket.id].getSessionCode());
 			socket.emit('logged_out');
 		});
 
+		// On user session resumed
 		socket.on('re_session', function(data)
 		{
 			db_conn.query("SELECT * FROM temp WHERE session_id='"+data+"'", function(err, rows, fields)

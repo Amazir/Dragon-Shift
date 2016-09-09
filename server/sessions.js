@@ -18,7 +18,7 @@ method.addToDB = function(db, sid, usr)
 
 method.removeFromDB = function(db,sid)
 {
-	db.query("DELETE FROM temp WHERE securex=1", function(error)
+	db.query("DELETE FROM temp WHERE securex=1 AND session_id='"+sid+"'", function(error)
 	{
 		if(error)
 			console.log(error);
