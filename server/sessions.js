@@ -16,13 +16,24 @@ method.addToDB = function(db, sid, usr)
 		});
 };
 
-method.removeFromDB = function(db,sid)
+method.removeFromDB = function(db,sid,byid)
 {
-	db.query("DELETE FROM temp WHERE securex=1 AND session_id='"+sid+"'", function(error)
+	if(byid)
 	{
-		if(error)
-			console.log(error);
-	});
+		db.query("DELETE FROM temp WHERE securex=1 AND session_id='"+sid+"'", function(error)
+		{
+			if(error)
+				console.log(error);
+		});
+	}
+	else
+	{
+		db.query("DELETE FROM temp WHERE securex=1", function(error)
+		{
+			if(error)
+				console.log(error);
+		});
+	}
 };
 
 method.generateID = function()

@@ -158,8 +158,6 @@ function setUpEventHandlers()
 
 		for(var i=0; i<data.length;i++)
 		{
-			debugX = data[i].x;
-			debugY = data[i].y;
 			ctx.drawImage(pImg,data[i].x,data[i].y);
 			var collision = (data[i].x, data[i].y, 32, 32, 290, 110, 32, 32);
 			io.emit('is_colliding', collision);

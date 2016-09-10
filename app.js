@@ -96,6 +96,7 @@ function setUpEventHandlers()
 					{
 						if(rows.length === 1)
 						{
+							PLAYERS_LIST[socket.id].setName(data.username);
 							socket.emit('login_status', {valid:true});
 							var sid = session.generateID();
 							PLAYERS_LIST[socket.id].setSessionCode(sid);
@@ -144,6 +145,8 @@ function init()
 	setUpRouting();
 	setUpEventHandlers();
 
+	var toBackup = 0;
+
 	setInterval(function()
 	{
 	    var pack = [];
@@ -151,6 +154,7 @@ function init()
 	    {
 	        var player = PLAYERS_LIST[i];
 	        player.updatePosition();
+	        toBackup++;
 	        pack.push(
 	        {
 	            x:player.x,
@@ -164,6 +168,15 @@ function init()
 	        socket.emit('new_positions',pack);
 	    }
 	},1000/25);
+
+	setInterval(function()
+	{
+		for(var i in PLAYERS_LIST)
+		{
+			var player = PLAYERS_LIST[i];
+			db_conn.query("UPDATE players SET x="+player.x+",y="+player.y+" WHERE login='"+player.getName()+"'");
+		}
+	}, 1000/10);
 }
 
 init();
