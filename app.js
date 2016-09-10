@@ -27,10 +27,15 @@ var db_conn = mysql.createConnection(
 db_conn.connect(function(err)
 {
 	if(err)
+	{
 		console.log(err);
+		process.exit(1);
+	}
 	else
 		console.log("DB CONNECTED");
 });
+
+session.removeFromDB(db_conn, "abcdefg", false);
 
 // Setting up HTTP routing
 function setUpRouting()
@@ -61,7 +66,7 @@ function setUpEventHandlers()
 		// On user logout
 		socket.on('logout', function()
 		{
-			session.removeFromDB(db_conn, PLAYERS_LIST[socket.id].getSessionCode());
+			session.removeFromDB(db_conn, PLAYERS_LIST[socket.id].getSessionCode(), true);
 			socket.emit('logged_out');
 		});
 
