@@ -21,7 +21,9 @@ grass.src = 'res/maps/tiles/grass.png';
 water.src = 'res/maps/tiles/water.png';
 sand.src = 'res/maps/tiles/sand.png';
 
-var nick = "Aamzir";
+ctx.font="17px Arial";
+
+var nick = "AmaziR";
 
 window.onload = function()
 {
@@ -34,6 +36,8 @@ window.onload = function()
 			{
 				$('#login').css({'display': 'none'});
 				$('#game').css({'display': 'block'});
+
+				nick = data.nick;
 			}
 			else
 				deleteCookie('session_id');
@@ -94,9 +98,6 @@ var mapArray = [
 [0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,2]
 ];
 
-var posX = 0;
-var posY = 0;
-
 // Setting up Event Handlers
 function setUpEventHandlers()
 {
@@ -117,6 +118,11 @@ function setUpEventHandlers()
 		{	
 			$('#login').css({'display': 'block'});
 			$('#game').css({'display': 'none'});
+			$('#error_box').html('<font color="red"><b>Wrong username or password / account is not activated !</b></font>');
+			setTimeout(function()
+			{
+				$('#error_box').html('');
+			}, 4000);
 		}
 	});
 
@@ -129,36 +135,48 @@ function setUpEventHandlers()
 	// On changing position by players
 	io.on('new_positions', function(data)
 	{
-		document.getElementById('info').innerHTML = "X: "+debugX+"<br /> Y: "+debugY+"<br />";
-		// Drawing game
+		/*
+
+			DRAWING GAME
+
+		*/
+
+		// Clear screen
 		ctx.clearRect(0,0,canvas.width,canvas.height);
+
+		// Drawing map
+		var tileSize = 32;
+		var tileX = 0;
+		var tileY = 0;
 		for(var i=0; i<mapArray.length; i++)
 		{
 			for(var j=0; j < mapArray[i].length; j++)
 			{
-				if(mapArray[i][j] == 0)
+				var ma = mapArray[i][j];
+				switch(ma)
 				{
-					ctx.drawImage(grass, posX, posY, 32, 32);
+					case 0:
+						ctx.drawImage(grass, tileX, tileY, tileSize, tileSize);
+						break;
+					case 1:
+						ctx.drawImage(sand, tileX, tileY, tileSize, tileSize);
+						break;
+					case 2:
+						ctx.drawImage(water, tileX, tileY, tileSize, tileSize);
+						break;
 				}
-				if(mapArray[i][j] == 1)
-				{
-					ctx.drawImage(sand, posX, posY, 32, 32);
-				}
-				if(mapArray[i][j] == 2)
-				{
-					ctx.drawImage(water, posX, posY, 32, 32);
-				}
-				posX+=32;
+				tileX+=32;
 			}
-			posX=0;
-			posY+=32;
+			tileX=0;
+			tileY+=32;
 		}
-		posX =0;
-		posY =0;
+		posY=0;
 
+		// Drawing player
 		for(var i=0; i<data.length;i++)
 		{
 			ctx.drawImage(pImg,data[i].x,data[i].y);
+			ctx.fillText(data[i].nick, data[i].x-data[i].width/2, data[i].y-data[i].height);
 			var collision = (data[i].x, data[i].y, 32, 32, 290, 110, 32, 32);
 			io.emit('is_colliding', collision);
 		}
@@ -166,6 +184,7 @@ function setUpEventHandlers()
 	});
 }
 
+// Secure the client
 function secure()
 {
 	if (showCookie('session_id')) {}

@@ -35,13 +35,17 @@ db_conn.connect(function(err)
 		console.log("DB CONNECTED");
 });
 
-session.removeFromDB(db_conn, "abcdefg", false);
+// Clearing temp database
+session.removeFromDB(db_conn, "123456789abcd", false);
 
 // Setting up HTTP routing
 function setUpRouting()
 {
 	// Game
 	app.use('/game', express.static(__dirname + '/client'));
+	// Home 
+	app.use('/', express.static(__dirname + '/home'));
+	app.use('/home', express.static(__dirname + '/home'));
 }
 
 // Setting up SOCKETS_LIST Event Handlers
@@ -76,7 +80,7 @@ function setUpEventHandlers()
 			db_conn.query("SELECT * FROM temp WHERE session_id='"+data+"'", function(err, rows, fields)
 			{
 				if(rows.length === 1)
-					socket.emit('re_session_status', {valid:true});
+					socket.emit('re_session_status', {valid:true, nick:rows[2]});
 				else
 					socket.emit('re_session_status', {valid:true});
 			});
@@ -159,7 +163,9 @@ function init()
 	        {
 	            x:player.x,
 	            y:player.y,
-	            number:player.number
+	            width: player.width,
+	            height: player.height,
+	            nick:player.getName()
 	        });
 	    }
 	    for(var i in SOCKETS_LIST)

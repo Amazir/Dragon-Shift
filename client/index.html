@@ -13,8 +13,11 @@
 </head>
 <body>
 	<div id="login" style="display: none;">
-		Username: <input id="login-username" type="text" /><br />
+		<div id="error_box"></div>
+		<div id="login_inputs">
+		<div style="margin-bottom: 3px;">Username: <input id="login-username" type="text" /><br /></div>
 		Password: <input id="login-password" type="password" /><br />
+		</div><br />
 		<input id="login-signIn" type="submit" value="Sign In">
 		<!-- <button id="login-signIn">Sign In</button> -->
 		<button id="login-signUp">Sign Up</button>

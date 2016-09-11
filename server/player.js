@@ -8,6 +8,9 @@ function Player(x, y, id)
 	this.oldX = x;
 	this.oldY = y;
 
+	this.width = 32;
+	this.height = 32;
+
 	this.id = id;
 	this.nick = "unnamed";
 
