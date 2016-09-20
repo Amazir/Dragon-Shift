@@ -1,6 +1,10 @@
 // Requires
 var express = require('express');
+
+// Sockets
 var io = require('socket.io')(3001);
+var io_home = require('socket.io')(3002);
+
 var mysql = require('mysql');
 
 var Player = require('./server/player.js');
@@ -51,6 +55,23 @@ function setUpRouting()
 // Setting up SOCKETS_LIST Event Handlers
 function setUpEventHandlers()
 {
+	/*
+
+		WEBSITE
+
+	*/
+	
+	io_home.on('connection', function(socket)
+	{
+
+	});
+
+	/*
+
+		IN-GAME
+
+	*/
+
 	// On connection
 	io.on('connection', function(socket)
 	{
