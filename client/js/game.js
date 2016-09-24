@@ -1,5 +1,22 @@
-// Comunicate with server
 var io = io('http://localhost:3001');
+
+/*
+	
+	ROZKŁAD NA WRZESIEN
+
+	TODO:
+	- POSTACIE (22.09) -
+	- LVL (23.09) X
+	- PUNKTY PREMIUM (24.09) X
+	- MAPY (25.09) X
+	- KOLIZJE (26.09) X
+	- FIX DO SESJI (26.09) X
+	- MONETYZACJA (28.09) X
+	- SZLIFY I ZABEZPIECZENIA (27 - 28.09) X
+	- WYDANIE COMMITA (29.09) X
+	- ODPOCZYNEK (30.09) X
+
+*/
 
 // Setting up canvas
 var canvas = document.getElementById('gameWindow');
@@ -15,7 +32,6 @@ var debugX =0, debugY =0;
 // Tiles
 var grass = new Image();
 var water = new Image();
-
 var sand = new Image();
 grass.src = 'res/maps/tiles/grass.png';
 water.src = 'res/maps/tiles/water.png';
@@ -23,7 +39,7 @@ sand.src = 'res/maps/tiles/sand.png';
 
 ctx.font="17px Arial";
 
-var nick = "AmaziR";
+var nick = "undefined";
 
 window.onload = function()
 {
@@ -35,7 +51,7 @@ window.onload = function()
 			if(data.valid)
 			{
 				$('#login').css({'display': 'none'});
-				$('#game').css({'display': 'block'});
+				$('#champ_select').css({'display': 'block'});
 
 				nick = data.nick;
 			}
@@ -106,8 +122,17 @@ function setUpEventHandlers()
 	{
 		if(data.valid)
 		{
+			$('#champs').val("");
 			$('#login').css({'display': 'none'});
-			$('#game').css({'display': 'block'});
+			$('#champ_select').css({'display': 'block'});
+
+			io.emit('champ_list_req');
+			io.on('champ_list_res', function(data)
+			{
+				console.log(data);
+				for(i=0;i===data.length;i++)
+					$('#champs').append('<li>'+data[i]+'</li>');
+			});
 
 			io.on('session_code', function(data)
 			{
@@ -177,6 +202,7 @@ function setUpEventHandlers()
 		{
 			ctx.drawImage(pImg,data[i].x,data[i].y);
 			ctx.fillText(data[i].nick, data[i].x-data[i].width/2, data[i].y-data[i].height);
+			nick =  data[i].nick;
 			var collision = (data[i].x, data[i].y, 32, 32, 290, 110, 32, 32);
 			io.emit('is_colliding', collision);
 		}
@@ -194,7 +220,9 @@ function secure()
 		io.on('logged_out', function()
 		{
 			$('#login').css({'display': 'block'});
+			$('#champ_select').css({'display': 'none'});
 			$('#game').css({'display': 'none'});
+			$('#champs').val("");
 		});
 	}
 }

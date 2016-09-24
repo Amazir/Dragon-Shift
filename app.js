@@ -4,6 +4,7 @@ var express = require('express');
 // Sockets
 var io = require('socket.io')(3001);
 var io_home = require('socket.io')(3002);
+var io_login = require('socket.io')(3003);
 
 var mysql = require('mysql');
 
@@ -50,6 +51,7 @@ function setUpRouting()
 	// Home 
 	app.use('/', express.static(__dirname + '/home'));
 	app.use('/home', express.static(__dirname + '/home'));
+	app.use('/team', express.static(__dirname + '/home/ekipa'));
 }
 
 // Setting up SOCKETS_LIST Event Handlers
@@ -92,7 +94,21 @@ function setUpEventHandlers()
 		socket.on('logout', function()
 		{
 			session.removeFromDB(db_conn, PLAYERS_LIST[socket.id].getSessionCode(), true);
+			PLAYERS_LIST[socket.id].logged = false;
 			socket.emit('logged_out');
+		});
+
+		socket.on('champ_list_req', function()
+		{
+			db_conn.query("SELECT * FROM champs WHERE acc_id='"+
+				PLAYERS_LIST[socket.id].accountID+"'", 
+				function(err, rows, fields)
+			{
+				var dane = [];
+				for(i=0; i===rows.length; i++)
+					dane[i] = rows[i].name;
+				socket.emit('champ_list_res', dane);
+			});
 		});
 
 		// On user session resumed
@@ -127,9 +143,12 @@ function setUpEventHandlers()
 							PLAYERS_LIST[socket.id].setSessionCode(sid);
 							session.addToDB(db_conn, sid, data.username);
 							socket.emit('session_code', PLAYERS_LIST[socket.id].getSessionCode());
+							PLAYERS_LIST[socket.id].logged = true;
+							PLAYERS_LIST[socket.id].accountID = rows[0].id;
 						}
 						else
 						{
+							PLAYERS_LIST[socket.id].logged = false;
 							socket.emit('login_status', {valid:false});
 						}
 					}
@@ -139,26 +158,32 @@ function setUpEventHandlers()
 		// On incoming chat message
 		socket.on('incoming_chat_message', function(msg)
 		{
-			io.emit('chat_message', msg);
+			if(PLAYERS_LIST[socket.id].logged)
+			{
+				io.emit('chat_message', msg);
+			}
 		});
 
 		// On key pressed by user
 		socket.on('key_pressed', function(data)
 		{
-			switch(data.inputId)
+			if(PLAYERS_LIST[socket.id].logged)
 			{
-				case "key_left":
-					player.pressingLeft = data.state;
-					break;
-				case "key_right":
-					player.pressingRight = data.state;
-					break;
-				case "key_up":
-					player.pressingUp = data.state;
-					break;
-				case "key_down":
-					player.pressingDown = data.state;
-					break;
+				switch(data.inputId)
+				{
+					case "key_left":
+						player.pressingLeft = data.state;
+						break;
+					case "key_right":
+						player.pressingRight = data.state;
+						break;
+					case "key_up":
+						player.pressingUp = data.state;
+						break;
+					case "key_down":
+						player.pressingDown = data.state;
+						break;
+				}
 			}
 		});
 	});

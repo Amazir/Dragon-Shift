@@ -16,10 +16,14 @@ function Player(x, y, id)
 
 	this.sessionCode = "";
 
+	this.accountID = 0;
+
 	this.pressingRight = false;
 	this.pressingLeft = false;
 	this.pressingUp = false;
 	this.pressingDown = false;
+
+	this.logged = false;
 
 	this.maxSpd = 10;
 }
